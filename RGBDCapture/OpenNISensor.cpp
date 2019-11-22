@@ -132,7 +132,12 @@ bool OpenNISensor::init() {
   int delta = 100;
   m_colorStream.getCameraSettings()->setExposure(exposure + delta);
   m_flagInitSuccessful = true;
-
+  if (m_device.isImageRegistrationModeSupported(
+          openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR)) {
+    m_device.setImageRegistrationMode(
+        openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR);
+    std::cout << "registration is ok" << std::endl;
+  }
   return m_flagInitSuccessful;
 }
 
