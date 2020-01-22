@@ -1,10 +1,17 @@
 #include "OpenNISensor.h"
+#include <chrono>
 #include <iostream>
 
 OpenNISensor::OpenNISensor() {
   m_flagInitSuccessful = m_flagShowImage = true;
   m_frameNum = m_frameIdx = 0;
   m_sensorType = 0;
+  auto time_point = std::chrono::system_clock::now();
+  auto duration = time_point.time_since_epoch();
+  long seconds_from_epoch =
+      std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+  m_prefix = std::to_string(seconds_from_epoch);
+
   init();
 }
 
@@ -132,12 +139,14 @@ bool OpenNISensor::init() {
   int delta = 100;
   m_colorStream.getCameraSettings()->setExposure(exposure + delta);
   m_flagInitSuccessful = true;
+#ifdef REGISTRATION
   if (m_device.isImageRegistrationModeSupported(
           openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR)) {
     m_device.setImageRegistrationMode(
         openni::IMAGE_REGISTRATION_DEPTH_TO_COLOR);
     std::cout << "registration is ok" << std::endl;
   }
+#endif
   return m_flagInitSuccessful;
 }
 
@@ -165,7 +174,8 @@ void OpenNISensor::scan() {
       if (m_sensorType == 0)
         cv::flip(cImageBGR, cImageBGR, 1);
       cv::imshow(strColorWindowName, cImageBGR);
-      cv::imwrite(m_strRGBDFolder + "/rgb/" + to_string(m_frameIdx) + ".png",
+      cv::imwrite(m_strRGBDFolder + "/rgb/" + m_prefix + "_" +
+                      to_string(m_frameIdx) + ".png",
                   cImageBGR);
     } else {
       cerr << "ERROR: Cannot read color frame from color stream. Quitting..."
@@ -181,8 +191,13 @@ void OpenNISensor::scan() {
       mImageDepth.convertTo(cScaledDepth, CV_16UC1, c_depthScaleFactor);
       if (m_sensorType == 0)
         cv::flip(cScaledDepth, cScaledDepth, 1);
-      cv::imshow(strDepthWindowName, cScaledDepth);
-      cv::imwrite(m_strRGBDFolder + "/depth/" + to_string(m_frameIdx) + ".png",
+      cv::Mat cNormedDepth;
+      cv::normalize(cScaledDepth, cNormedDepth, 0, 255, NORM_MINMAX);
+      cv::Mat cColoredDepth;
+      cv::applyColorMap(cNormedDepth, cColoredDepth, COLORMAP_JET);
+      cv::imshow(strDepthWindowName, cColoredDepth);
+      cv::imwrite(m_strRGBDFolder + "/depth/" + m_prefix + "_" +
+                      to_string(m_frameIdx) + ".png",
                   cScaledDepth);
     } else {
       cerr << "ERROR: Cannot read depth frame from depth stream. Quitting..."

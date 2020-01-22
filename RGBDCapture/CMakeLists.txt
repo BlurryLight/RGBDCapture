@@ -8,14 +8,15 @@ find_package(OpenCV REQUIRED)
 find_package(Boost COMPONENTS filesystem REQUIRED)
 find_package(Boost COMPONENTS system REQUIRED)
 
+
 set(OPENNI_INCLUDE_DIR "/usr/include/openni2/")
-
-
 INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${OPENNI_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
 aux_source_directory(. DIR_SRCS)
+
+option(REGISTRATION "REGISTRATION DEPTH TO COLOR" ON)
 
 add_executable(RGBDCapture ${DIR_SRCS})
 
@@ -28,6 +29,10 @@ target_link_libraries(RGBDCapture
                       OpenNI2
                       )
 
+if(REGISTRATION)
+    set_target_properties(RGBDCapture PROPERTIES OUTPUT_NAME "RGBDCapture_rgs")
+    target_compile_definitions(RGBDCapture PRIVATE REGISTRATION)
+endif(REGISTRATION)
 
 # use C++11
 target_compile_features(RGBDCapture PRIVATE cxx_range_for)

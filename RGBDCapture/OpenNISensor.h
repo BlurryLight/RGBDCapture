@@ -1,10 +1,11 @@
 #ifndef OPENNISENSOR_H
 #define OPENNISENSOR_H
 
+#include "OpenNI.h"
 #include "RGBDSensor.h"
 #include "global.h"
-#include "OpenNI.h"
 #include <opencv2/opencv.hpp>
+#include <string>
 
 class OpenNISensor : public RGBDSensor
 {
@@ -25,6 +26,7 @@ private:
 	openni::VideoFrameRef	m_colorFrame;
 	bool m_flagInitSuccessful;
 	bool m_flagShowImage;
+        std::string m_prefix;
 };
 
 
