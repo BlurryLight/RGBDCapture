@@ -188,7 +188,7 @@ void OpenNISensor::scan() {
       cv::Mat mImageDepth(m_depthHeight, m_depthWidth, CV_16UC1,
                           (void *)m_depthFrame.getData());
       cv::Mat cScaledDepth;
-      mImageDepth.convertTo(cScaledDepth, CV_16UC1, c_depthScaleFactor);
+      mImageDepth.convertTo(cScaledDepth, CV_8UC1, c_depthScaleFactor);
       if (m_sensorType == 0)
         cv::flip(cScaledDepth, cScaledDepth, 1);
       cv::Mat cNormedDepth;

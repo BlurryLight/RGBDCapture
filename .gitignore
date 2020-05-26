@@ -255,4 +255,5 @@ paket-files/
 
 # JetBrains Rider
 .idea/
+*tags*
 *.sln.iml
