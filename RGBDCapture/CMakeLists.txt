@@ -21,6 +21,12 @@ LINK_DIRECTORIES(${OPENNI_BIN_DIR})
 aux_source_directory(. DIR_SRCS)
 
 option(REGISTRATION "REGISTRATION DEPTH TO COLOR" ON)
+option(IMSHOW "CV::IMSHOW" ON)
+
+if(NOT IMSHOW)
+    add_definitions(-DCV_NOSHOW)
+endif(NOT IMSHOW)
+
 
 add_executable(RGBDCapture ${DIR_SRCS})
 

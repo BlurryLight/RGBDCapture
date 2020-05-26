@@ -161,9 +161,11 @@ void OpenNISensor::scan() {
   createRGBDFolders();
 
   string strDepthWindowName("Depth"), strColorWindowName("Color");
+
+#ifndef CV_NOSHOW
   cv::namedWindow(strDepthWindowName, cv::WINDOW_AUTOSIZE);
   cv::namedWindow(strColorWindowName, cv::WINDOW_AUTOSIZE);
-
+#endif
   auto get_a_frame = [&]() -> void {
     m_colorStream.readFrame(&m_colorFrame);
     if (m_colorFrame.isValid()) {
@@ -173,7 +175,9 @@ void OpenNISensor::scan() {
       cv::cvtColor(mImageRGB, cImageBGR, cv::COLOR_RGB2BGR);
       if (m_sensorType == 0)
         cv::flip(cImageBGR, cImageBGR, 1);
+#ifndef CV_NOSHOW
       cv::imshow(strColorWindowName, cImageBGR);
+#endif
       cv::imwrite(m_strRGBDFolder + "/rgb/" + m_prefix + "_" +
                       to_string(m_frameIdx) + ".png",
                   cImageBGR);
@@ -193,9 +197,11 @@ void OpenNISensor::scan() {
         cv::flip(cScaledDepth, cScaledDepth, 1);
       cv::Mat cNormedDepth;
       cv::normalize(cScaledDepth, cNormedDepth, 0, 255, NORM_MINMAX);
+#ifndef CV_NOSHOW
       cv::Mat cColoredDepth;
       cv::applyColorMap(cNormedDepth, cColoredDepth, COLORMAP_JET);
       cv::imshow(strDepthWindowName, cColoredDepth);
+#endif
       cv::imwrite(m_strRGBDFolder + "/depth/" + m_prefix + "_" +
                       to_string(m_frameIdx) + ".png",
                   cScaledDepth);
@@ -206,24 +212,28 @@ void OpenNISensor::scan() {
     }
     m_frameIdx++;
   };
-
-  while (true) {
-    char key = cv::waitKey(1);
-    if (key == 27) {
-      break;
-    } else if (key == 32) {
-      continous_flag = !continous_flag;
-      std::cout << (continous_flag ? "continuous capture" : "press capture")
-                << std::endl;
-    } else if (!continous_flag && (key == 13 || key == 110)) // enter or n
-    {
-      std::cout << this->m_frameIdx << std::endl;
-      get_a_frame();
-    }
-
-    if (continous_flag) {
-      std::cout << this->m_frameIdx << std::endl;
-      get_a_frame();
-    }
+while (true) {
+#ifndef CV_NOSHOW
+  char key = cv::waitKey(1);
+  if (key == 27) {
+    break;
+  } else if (key == 32) {
+    continous_flag = !continous_flag;
+    std::cout << (continous_flag ? "continuous capture" : "press capture")
+              << std::endl;
+  } else if (!continous_flag && (key == 13 || key == 110)) // enter or n
+  {
+    std::cout << this->m_frameIdx << std::endl;
+    get_a_frame();
   }
+
+  if (continous_flag) {
+    std::cout << this->m_frameIdx << std::endl;
+    get_a_frame();
+  }
+#else
+  std::cout << this->m_frameIdx << std::endl;
+  get_a_frame();
+#endif
+}
 }
