@@ -1,0 +1,6 @@
+[submodule "OpenNI2"]
+	path = OpenNI2
+	url = https://github.com/occipital/OpenNI2.git
+[submodule "libfreenect"]
+	path = libfreenect
+	url = https://github.com/OpenKinect/libfreenect

@@ -1,17 +1,20 @@
 cmake_minimum_required(VERSION 2.6.0)
+project(RGBDCapture)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}")
 
 find_package(ZLIB REQUIRED)
 set(OpenCV_DIR /home/panda/opt/opencv412-build/lib/cmake/opencv4/)
-find_package(OpenCV 4.1.2 REQUIRED)
+find_package(OpenCV REQUIRED)
+if(OpenCV_VERSION VERSION_LESS 3.0.0)
+    message(FATAL_ERROR "OPENCV needs to be 3.x/4.x!")
+endif(OPENCV_PACKAGE_VERSION VERSION_LESS 3.0.0)
 find_package(Boost COMPONENTS filesystem REQUIRED)
 find_package(Boost COMPONENTS system REQUIRED)
 
 
-#set(OPENNI_INCLUDE_DIR "/usr/include/openni2/")
-set(OPENNI_INCLUDE_DIR "/home/panda/OpenNI2/Include/")
-set(OPENNI_BIN_DIR "/home/panda/OpenNI2/Bin/x64-Release/")
+set(OPENNI_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/../OpenNI2/Include/")
+set(OPENNI_BIN_DIR "${CMAKE_SOURCE_DIR}/../Bin/x64-Release/")
 INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
 INCLUDE_DIRECTORIES(${OPENNI_INCLUDE_DIR})
 message(${OpenCV_DIR})
@@ -34,7 +37,7 @@ target_link_libraries(RGBDCapture
                       ${ZLIB_LIBRARY}
                       ${OpenNI_LIBRARIES}
                       ${OpenCV_LIBS}
-        		      ${Boost_SYSTEM_LIBRARIES}
+                      ${Boost_SYSTEM_LIBRARIES}
                       ${Boost_FILESYSTEM_LIBRARIES}
                       OpenNI2
                       )

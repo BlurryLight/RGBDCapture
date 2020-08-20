@@ -11,9 +11,9 @@ class RGBDSensor{
 public:
 	RGBDSensor(){}
 
-	~RGBDSensor(){}
+        virtual ~RGBDSensor() {}
 
-	virtual bool init() = 0;
+        virtual bool init() = 0;
 
 	virtual void scan() = 0;
 

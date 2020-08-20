@@ -169,6 +169,8 @@ void OpenNISensor::scan() {
 #endif
   auto get_a_frame = [&]() -> void {
     m_colorStream.readFrame(&m_colorFrame);
+    m_depthStream.readFrame(&m_depthFrame);
+    auto timestamp = m_colorFrame.getTimestamp();
     if (m_colorFrame.isValid()) {
       cv::Mat mImageRGB(m_colorHeight, m_colorWidth, CV_8UC3,
                         (void *)m_colorFrame.getData());
@@ -188,7 +190,6 @@ void OpenNISensor::scan() {
       return;
     }
 
-    m_depthStream.readFrame(&m_depthFrame);
     if (m_depthFrame.isValid()) {
       cv::Mat mImageDepth(m_depthHeight, m_depthWidth, CV_16UC1,
                           (void *)m_depthFrame.getData());

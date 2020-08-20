@@ -10,13 +10,13 @@
 class OpenNISensor : public RGBDSensor
 {
 public:
-	OpenNISensor();
+  OpenNISensor();
 
-	~OpenNISensor();
+  ~OpenNISensor();
 
-	bool init();
+  bool init();
 
-	void scan();
+  void scan();
 
 private:
 	openni::Device			m_device;
