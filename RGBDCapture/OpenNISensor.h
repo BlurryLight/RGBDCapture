@@ -27,7 +27,7 @@ private:
 	bool m_flagInitSuccessful;
 	bool m_flagShowImage;
         std::string m_prefix;
+        vector<int> compression_params;
 };
-
 
 #endif

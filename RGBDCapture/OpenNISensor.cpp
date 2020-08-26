@@ -14,6 +14,13 @@ OpenNISensor::OpenNISensor() {
   m_prefix = std::to_string(seconds_from_epoch);
 
   init();
+#ifndef SAVEJPG
+  this->compression_params.push_back(cv::IMWRITE_PNG_COMPRESSION);
+  this->compression_params.push_back(9); // max level compression
+#else
+  this->compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
+  this->compression_params.push_back(85);
+#endif
 }
 
 OpenNISensor::~OpenNISensor() {
@@ -82,41 +89,6 @@ bool OpenNISensor::init() {
     return m_flagInitSuccessful;
   }
 
-  ///**
-  // Get all supported video mode for depth and color sensors, since each device
-  // always supports multiple video modes, such as 320x240/640x480 resolution,
-  // 30/60 fps for depth or color sensors.
-  //*/
-  // const SensorInfo* depthSensorInfo =
-  // m_device[i].getSensorInfo(SENSOR_DEPTH); int depthVideoModeNum =
-  // depthSensorInfo->getSupportedVideoModes().getSize(); cout << "Depth video
-  // modes: " << endl; for (int j = 0; j < depthVideoModeNum; ++j)
-  //{
-  //	VideoMode videomode = depthSensorInfo->getSupportedVideoModes()[j];
-  //	cout << "Mode " << j << ": Resolution = (" << videomode.getResolutionX()
-  //		<< "," << videomode.getResolutionY() << ")"
-  //		<< ", PixelFormat = "<< videomode.getPixelFormat()
-  //		<< ", FPS = " << videomode.getFps() << endl;
-  //}
-  // const SensorInfo* colorSensorInfo =
-  // m_device[i].getSensorInfo(SENSOR_COLOR); int colorVideoModeNum =
-  // colorSensorInfo->getSupportedVideoModes().getSize(); cout << "Color video
-  // modes: " << endl; for (int j = 0; j < colorVideoModeNum; ++j)
-  //{
-  //	VideoMode videomode = colorSensorInfo->getSupportedVideoModes()[j];
-  //	cout << "Mode " << j << ": Resolution = (" << videomode.getResolutionX()
-  //		<< "," << videomode.getResolutionY() << ")"
-  //		<< ", PixelFormat = "<< videomode.getPixelFormat()
-  //		<< ", FPS = " << videomode.getFps() << endl;
-  //}
-
-  //// Set video modes for depth and color streams if the default ones are not
-  //// waht we need. You can check the video modes using above codes.
-  ////m_depthStream[i].setVideoMode(depthSensorInfo->getSupportedVideoModes()[0]);
-  ////VideoMode videomode = colorSensorInfo->getSupportedVideoModes()[9];
-  ////videomode.setPixelFormat(openni::PIXEL_FORMAT_RGB888);
-  ////openni::Status status =
-  /// m_colorStream[i].setVideoMode(colorSensorInfo->getSupportedVideoModes()[9]);
 
   if (!m_depthStream.isValid() || !m_colorStream.isValid()) {
     cerr << "SimpleViewer: No valid streams. Exiting" << endl;
@@ -183,7 +155,7 @@ void OpenNISensor::scan() {
 #endif
       cv::imwrite(m_strRGBDFolder + "/rgb/" + m_prefix + "_" +
                       to_string(m_frameIdx) + ".png",
-                  cImageBGR);
+                  cImageBGR, this->compression_params);
     } else {
       cerr << "ERROR: Cannot read color frame from color stream. Quitting..."
            << endl;
@@ -194,7 +166,7 @@ void OpenNISensor::scan() {
       cv::Mat mImageDepth(m_depthHeight, m_depthWidth, CV_16UC1,
                           (void *)m_depthFrame.getData());
       cv::Mat cScaledDepth;
-      mImageDepth.convertTo(cScaledDepth, CV_16UC1, c_depthScaleFactor);
+      mImageDepth.convertTo(cScaledDepth, CV_16UC1, DepthScaleFactor);
       if (m_sensorType == 0)
         cv::flip(cScaledDepth, cScaledDepth, 1);
       cv::Mat cNormedDepth;
@@ -205,9 +177,14 @@ void OpenNISensor::scan() {
       cv::applyColorMap(cNormedDepth, cColoredDepth, COLORMAP_JET);
       cv::imshow(strDepthWindowName, cColoredDepth);
 #endif
+
+      std::string suffix{".png"};
+#ifdef SAVEJPG
+      suffix = ".jpg";
+#endif
       cv::imwrite(m_strRGBDFolder + "/depth/" + m_prefix + "_" +
-                      to_string(m_frameIdx) + ".png",
-                  cScaledDepth);
+                      to_string(m_frameIdx) + suffix,
+                  cScaledDepth, this->compression_params);
     } else {
       cerr << "ERROR: Cannot read depth frame from depth stream. Quitting..."
            << endl;
@@ -215,7 +192,7 @@ void OpenNISensor::scan() {
     }
     m_frameIdx++;
   };
-while (true) {
+  while (true) {
 #ifndef CV_NOSHOW
   char key = cv::waitKey(1);
   if (key == 27) {
