@@ -27,15 +27,19 @@ aux_source_directory(. DIR_SRCS)
 
 option(REGISTRATION "REGISTRATION DEPTH TO COLOR" ON)
 option(IMSHOW "CV::IMSHOW" ON)
-option(SAVEJPG "RGB image will be saved as compressed jpg" OFF)
+option(SAVEJPG "RGB images will be saved as compressed jpg" OFF)
+option(SAVETIMESTAMP "Images will be named for timestamps otherwise index" OFF)
 
 if(NOT IMSHOW)
     add_definitions(-DCV_NOSHOW)
 endif(NOT IMSHOW)
 
-if(SAVE_JPG)
+if(SAVEJPG)
     add_definitions(-DSAVEJPG)
-endif(SAVE_JPG)
+endif(SAVEJPG)
+if(SAVETIMESTAMP)
+    add_definitions(-DSAVETIMESTAMP)
+endif(SAVETIMESTAMP)
 
 add_executable(RGBDCapture ${DIR_SRCS})
 
