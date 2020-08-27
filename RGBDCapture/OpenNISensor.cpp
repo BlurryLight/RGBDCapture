@@ -159,8 +159,14 @@ void OpenNISensor::scan() {
       cv::imshow(strColorWindowName, cImageBGR);
 #endif
 
+#ifdef SAVEJPG
+      std::string suffix{".png"};
+#else
+      std::string suffix{".jpg"};
+#endif
+
       cv::imwrite(m_strRGBDFolder + "/rgb/" + m_prefix + "_" +
-                      to_string(imgIndex) + ".png",
+                      to_string(imgIndex) + suffix,
                   cImageBGR, this->compression_params);
     } else {
       cerr << "ERROR: Cannot read color frame from color stream. Quitting..."
@@ -184,13 +190,9 @@ void OpenNISensor::scan() {
       cv::imshow(strDepthWindowName, cColoredDepth);
 #endif
 
-      std::string suffix{".png"};
-#ifdef SAVEJPG
-      suffix = ".jpg";
-#endif
       cv::imwrite(m_strRGBDFolder + "/depth/" + m_prefix + "_" +
-                      to_string(imgIndex) + suffix,
-                  cScaledDepth, this->compression_params);
+                      to_string(imgIndex) + ".png",
+                  cScaledDepth);
     } else {
       cerr << "ERROR: Cannot read depth frame from depth stream. Quitting..."
            << endl;
