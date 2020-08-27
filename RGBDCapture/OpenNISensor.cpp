@@ -159,7 +159,7 @@ void OpenNISensor::scan() {
       cv::imshow(strColorWindowName, cImageBGR);
 #endif
 
-#ifdef SAVEJPG
+#ifndef SAVEJPG
       std::string suffix{".png"};
 #else
       std::string suffix{".jpg"};
@@ -178,7 +178,7 @@ void OpenNISensor::scan() {
       cv::Mat mImageDepth(m_depthHeight, m_depthWidth, CV_16UC1,
                           (void *)m_depthFrame.getData());
       cv::Mat cScaledDepth;
-      mImageDepth.convertTo(cScaledDepth, CV_16UC1, DepthScaleFactor);
+      mImageDepth.convertTo(cScaledDepth, CV_16UC1, kDepthScaleFactor);
       if (m_sensorType == 0)
         cv::flip(cScaledDepth, cScaledDepth, 1);
       cv::Mat cNormedDepth;

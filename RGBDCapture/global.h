@@ -9,9 +9,6 @@ using namespace cv;
 using namespace std;
 
 typedef unsigned short DepthValueType;
-// const float c_depthScaleFactor = 1.0; //do not touch my depth
-#ifndef DepthScaleFactor
-#define DepthScaleFactor 1.0
-#endif
+constexpr static float kDepthScaleFactor = 1.0; // do not touch my depth
 
 #endif
